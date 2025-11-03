@@ -1,0 +1,7 @@
+include:
+  - project: workloads/ci-templates
+    ref: main
+    file: cf-pages-bun-v1.0.yaml
+
+variables:
+  CF_PAGES_PROJECT_ID: jiren-ai
