@@ -1,4 +1,4 @@
-import { toast } from "~/components/ui/toast";
+import {toast} from "~/components/ui/toast";
 import Fetch from "..";
 import type {
   IAgent,
@@ -7,12 +7,14 @@ import type {
   IConversation,
   ISectionCharacter,
 } from "./type";
+import {createX402Client} from "x402-solana/client";
+import {CONNECTION_CONFIG} from "~/constants";
 
 export async function createNewConversation(
   character_id: string
 ): Promise<any> {
   try {
-    const { data } = await Fetch.post<{ data: any }>(`@api/conversations/new`, {
+    const {data} = await Fetch.post<{ data: any }>(`@api/conversations/new`, {
       character_id,
     });
     return data.data;
@@ -27,7 +29,7 @@ export async function findConversationById(
   id: string
 ): Promise<IConversation | undefined> {
   try {
-    const { data } = await Fetch.get<{ data: IConversation }>(
+    const {data} = await Fetch.get<{ data: IConversation }>(
       `@api/conversations/${id}`
     );
     return data.data;
@@ -46,7 +48,7 @@ export async function fetchChatHistory(
   } = {}
 ): Promise<IChatMessage[]> {
   try {
-    const { data } = await Fetch.get<{ data: IChatMessage[] }>(
+    const {data} = await Fetch.get<{ data: IChatMessage[] }>(
       `@api/conversations/${conv_id}/history`,
       {
         params: {
@@ -63,9 +65,33 @@ export async function fetchChatHistory(
   }
 }
 
+
+export const createCharacter402 = async (body: any) => {
+  const headers: any = {
+    "Content-Type": 'application/json',
+    "Accept": 'application/json; indent=2',
+  }
+  const accessToken = localStorage.getItem("access_token");
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`
+  }
+  const {wallets} = useSolConnect()
+  const client = createX402Client({
+    wallet: wallets.value[0].adapter,
+    network: 'solana',
+    rpcUrl: CONNECTION_CONFIG.mainnet
+  });
+  const response = await client.fetch(`${AppConfig.env.API_BASE_URL}/characters`, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(body),
+  });
+  return await response.json().then(x => x.data).catch((error: any) => null);
+}
+
 export async function fetchConversations(): Promise<IConversation[]> {
   try {
-    const { data } = await Fetch.get<{ data: IConversation[] }>(
+    const {data} = await Fetch.get<{ data: IConversation[] }>(
       `@api/conversations`
     );
     return data.data;
@@ -78,7 +104,7 @@ export async function fetchConversations(): Promise<IConversation[]> {
 
 export async function deleteConversationById(id: string): Promise<boolean> {
   try {
-    const { data } = await Fetch.delete<{ data: IConversation }>(
+    const {data} = await Fetch.delete<{ data: IConversation }>(
       `@api/conversations/${id}`
     );
     return true;
@@ -92,7 +118,7 @@ export async function fetchPublicListCharacter(
   search?: string
 ): Promise<ISectionCharacter[]> {
   try {
-    const { data } = await Fetch.get<{
+    const {data} = await Fetch.get<{
       data: { sections: ISectionCharacter[] };
     }>(`@api/characters/explore`, {
       params: {
@@ -111,7 +137,7 @@ export async function fetchPublicListCharacter(
 
 export async function fetchListRecentCharacter(): Promise<ICharacter[]> {
   try {
-    const { data } = await Fetch.get<{ data: { items: any[] } }>(
+    const {data} = await Fetch.get<{ data: { items: any[] } }>(
       `@api/characters/recent`,
       {
         params: {
@@ -130,7 +156,7 @@ export async function fetchListRecentCharacter(): Promise<ICharacter[]> {
 
 export async function fetchMyListCharacter(): Promise<ICharacter[]> {
   try {
-    const { data } = await Fetch.get<{ data: { items: ICharacter[] } }>(
+    const {data} = await Fetch.get<{ data: { items: ICharacter[] } }>(
       `@api/characters/my-characters`,
       {
         params: {
@@ -151,7 +177,7 @@ export async function fetchListCharacterByUser(
   uid: string
 ): Promise<ICharacter[]> {
   try {
-    const { data } = await Fetch.get<{ data: { items: ICharacter[] } }>(
+    const {data} = await Fetch.get<{ data: { items: ICharacter[] } }>(
       `@api/characters/by-creator`,
       {
         params: {
@@ -173,7 +199,7 @@ export async function fetchCharacterById(
   char_id: string
 ): Promise<ICharacter | null> {
   try {
-    const { data } = await Fetch.get<{ data: ICharacter }>(
+    const {data} = await Fetch.get<{ data: ICharacter }>(
       `@api/characters/${char_id}`
     );
     return data.data;
@@ -186,7 +212,7 @@ export async function fetchCharacterById(
 
 export async function fetchListAgents(): Promise<IAgent[]> {
   try {
-    const { data } = await Fetch.get<{ data: IAgent[] }>(`@api/agents`);
+    const {data} = await Fetch.get<{ data: IAgent[] }>(`@api/agents`);
     return data.data;
   } catch (error: any) {
     console.error("fetchListAgents er", error);
@@ -214,7 +240,7 @@ export async function postCreateCharacter(body: {
   visibility: "public" | "private";
 }): Promise<ICharacter | undefined> {
   try {
-    const { data } = await Fetch.post<{ data: any }>(`@api/characters`, body);
+    const {data} = await Fetch.post<{ data: any }>(`@api/characters`, body);
     return data.data;
   } catch (error: any) {
     console.log("findDepositAction er", error.response._data);
@@ -248,7 +274,7 @@ export async function putUpdateCharacter(
   }
 ): Promise<ICharacter | undefined> {
   try {
-    const { data } = await Fetch.put<{ data: any }>(
+    const {data} = await Fetch.put<{ data: any }>(
       `@api/characters/${id}`,
       body
     );
@@ -278,7 +304,7 @@ export async function fetchHistoriesByCharacter(
   chid: string
 ): Promise<IConversation[]> {
   try {
-    const { data } = await Fetch.get<{ data: { items: IConversation[] } }>(
+    const {data} = await Fetch.get<{ data: { items: IConversation[] } }>(
       `@api/conversations/by-character`,
       {
         params: {

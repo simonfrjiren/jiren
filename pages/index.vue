@@ -241,9 +241,8 @@ definePageMeta({
 }
 
 .section .container:before {
-  @apply absolute inset-y-0 inset-x-4 md:inset-x-10 border-x border-white/10;
+  @apply absolute inset-y-0 inset-x-4 md:inset-x-10 border-x border-white/10 -z-10;
   content: "";
-
 }
 
 .btn {

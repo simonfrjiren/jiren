@@ -2,6 +2,7 @@
 import { toast } from "~/components/ui/toast";
 import { LIST_TAGS } from "~/constants";
 import {
+  createCharacter402,
   postCreateCharacter,
   putUpdateCharacter,
 } from "~/services/api/chat/api";
@@ -58,7 +59,7 @@ async function submitCreate() {
   };
   const res = await (props.char
     ? putUpdateCharacter(props.char.id, body)
-    : postCreateCharacter(body));
+    : createCharacter402(body));
   loading.value = false;
   // 01983bd931337b098e73080a9b8bdb82
   if (res) {
